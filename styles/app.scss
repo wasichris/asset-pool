@@ -1,0 +1,50 @@
+@import "normalize"; // 正規
+@import "variables"; // 變數
+@import "mixins"; // 方法
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+
+
+// ====== utils =======
+
+.center-wraper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.ant-card.login-card {
+  width: 100%;
+  max-width: 400px;
+  // background-color:#009FCC;
+
+  .login-form-button {
+    width: 100%;
+  }
+
+  .site-form-item-icon{
+    color: rgba(0, 0, 0, 0.25);
+    margin-right: 5px;
+  }
+}
+
+
+.ant-card.register-card {
+  width: 100%;
+  max-width: 500px;
+}
+
