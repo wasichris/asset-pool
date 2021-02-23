@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import axios from 'axios'
 import Link from 'next/link'
-import firebase from 'firebase/app'
+// import firebase from 'firebase/app'
 
 export default function Login (props) {
   const router = useRouter()
@@ -29,7 +29,7 @@ export default function Login (props) {
     const { data: { loginStatus, msg, userUid } } = await axios.post(url, { email, password })
     if (loginStatus) {
       message.info('成功登入')
-      await firebase.auth().signInWithEmailAndPassword(email, password) // oh no
+      // await firebase.auth().signInWithEmailAndPassword(email, password) // oh no
 
       console.log(userUid)
       router.push('/')
