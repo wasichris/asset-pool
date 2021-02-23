@@ -4,11 +4,11 @@
 // has the following format:
 import firebase from 'firebase/app'
 import { withIronSession } from 'next-iron-session'
-import firebaseHelper from '../../helpers/firebaseHelper.js'
+// import firebaseHelper from '../../helpers/firebaseHelper.js'
 
 async function handler (req, res) {
   // 初始 firebase
-  firebaseHelper.initFirebase() // oh no
+  // firebaseHelper.initFirebase() // oh no
 
   // req data
   try {
@@ -17,6 +17,12 @@ async function handler (req, res) {
       // logout firebase
       const uu = firebase.auth().currentUser // oh no
       console.log('=========== logout ===========', uu) // oh no
+
+      const db = firebase.database()
+      const eventref = db.ref('users/bNWo1umowMRiSQFyHwdVaHvYRRq1/funds')// oh no
+      const snapshot = await eventref.once('value')// oh no
+      snapshot.val()// oh no
+
       await firebase.auth().signOut()
 
       // destroy session
