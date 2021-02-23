@@ -15,6 +15,8 @@ async function handler (req, res) {
     const user = req.session.get('user')
     if (user) {
       // logout firebase
+      const uu = firebase.auth().currentUser // oh no
+      console.log('=========== logout ===========', uu) // oh no
       await firebase.auth().signOut()
 
       // destroy session

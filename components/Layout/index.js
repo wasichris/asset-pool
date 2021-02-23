@@ -19,6 +19,8 @@ export default function Layout ({ children, user, noBg }) {
   const handleLogout = async () => {
     const url = '/api/logout'
     await axios.post(url)
+    const uu = firebase.auth().currentUser // oh no
+    console.log('=========== logout ===========', uu) // oh no
     await firebase.auth().signOut() // oh no
     router.push('/login')
   }
