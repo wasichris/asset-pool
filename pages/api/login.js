@@ -4,15 +4,18 @@
 // has the following format:
 import firebase from 'firebase/app'
 import { withIronSession } from 'next-iron-session'
+import firebaseHelper from '../../helpers/firebaseHelper.js'
 
 async function handler (req, res) {
+  // 初始 firebase
+  firebaseHelper.initFirebase()
+
   // req data
   const { body: { email, password } } = req
   let returnData = { loginStatus: true, msg: '' }
 
   try {
     // validate email & password with firebase
-    require('firebase/auth')
     const { user } = await firebase.auth().signInWithEmailAndPassword(email, password)
     returnData = { loginStatus: true, msg: '', userUid: user.uid }
 
