@@ -3,8 +3,8 @@
 
 // you can add app CSS files by importing them from pages/_app.js.
 // You cannot import app CSS anywhere else.
+import 'antd/dist/antd.css'
 import '../styles/app.scss'
-import 'antd/dist/antd.css' // or 'antd/dist/antd.less'
 
 import firebaseHelper from '../helpers/firebaseHelper.js'
 

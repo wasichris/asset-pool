@@ -51,12 +51,11 @@ export default function Register (props) {
     firebase.auth().createUserWithEmailAndPassword(email, password)
       .then(u => {
         // 取得註冊當下的時間
-        const date = new Date()
-        const now = date.getTime()
+        const now = (new Date()).getTime()
         console.log('user:', u.user)
 
         // 記錄相關資訊到 firebase realtime database
-        database.ref(u.uid).set({
+        database.ref(`users/${u.user.uid}`).set({
           signup: now,
           email,
           nickname
@@ -72,7 +71,7 @@ export default function Register (props) {
   }
 
   return (
-    <Layout>
+    <Layout noBg>
 
       <Head>
         <title>Register</title>
@@ -112,7 +111,16 @@ export default function Register (props) {
                 {
                   required: true,
                   message: 'Please input your password!'
-                }
+                },
+                ({ getFieldValue }) => ({
+                  validator (_, value) {
+                    if (!value || value.length >= 6) {
+                      return Promise.resolve()
+                    }
+                    // eslint-disable-next-line prefer-promise-reject-errors
+                    return Promise.reject('Password should be at least 6 characters')
+                  }
+                })
               ]}
               hasFeedback
             >

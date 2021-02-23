@@ -16,33 +16,24 @@ function Home ({ user }) {
   const [fundDetails, setFundDetails] = useState([])
   const [myFunds, setMyFunds] = useState([])
   const [fundOptions, setFundOptions] = useState([])
-  const [isLogin, setIsLogin] = useState(false)
-  const [userName, setUserName] = useState('')
   const [isLoading, setIsLoading] = useState('')
   const [targetUpdateFund, setTargetUpdateFund] = useState({})
   const [isShowUpdateFundModal, setIsShowUpdateFundModal] = useState(false)
   const [form] = Form.useForm()
 
-  // Why Is Window Not Defined In NextJS?
-  // 放到 useState(JSON.parse(window.localStorage.getItem("funds"))) 就炸了
-  // https://medium.com/frontend-digest/why-is-window-not-defined-in-nextjs-44daf7b4604e
   useEffect(() => {
-    // setMyFunds(loadMyFunds())
-    // const loginUser = firebase.auth().currentUser
-    // console.log('%c loginUser ', 'background-color: #3A88AE; color: white;font-size: 14px; font-weight: bold;', loginUser)
-
-    const localUserName = window.localStorage.getItem('userName')
-    if (localUserName) {
-      setUserName(localUserName)
-      // login()
+    async function setupMyFunds () {
+      setMyFunds(await loadMyFunds(user.uid))
     }
-  }, [])
+
+    setupMyFunds()
+  }, [user.uid])
 
   useEffect(() => {
     async function fetchData () {
-      if (myFunds == null || myFunds.length === 0) {
-        return
-      }
+      // if (myFunds == null || myFunds.length === 0) {
+      //   return
+      // }
 
       const newFundDetails = []
       const apiResonses = []
@@ -83,18 +74,18 @@ function Home ({ user }) {
     fetchData()
   }, [myFunds])
 
-  const loadMyFunds = async () => {
+  const loadMyFunds = async (uid) => {
     const db = firebase.database()
-    const eventref = db.ref(userName + '/myFunds')
+    const eventref = db.ref(`users/${uid}/funds`)
     const snapshot = await eventref.once('value')
     const myFunds = snapshot.val()
 
     return myFunds || []
   }
 
-  const saveMyFunds = (newFunds) => {
+  const saveMyFunds = (uid, newFunds) => {
     const db = firebase.database()
-    const eventref = db.ref(userName + '/myFunds')
+    const eventref = db.ref(`users/${uid}/funds`)
     eventref.set(newFunds)
   }
 
@@ -113,7 +104,7 @@ function Home ({ user }) {
     const newFunds = [...myFunds]
     newFunds.push({ key: fundid + '-' + (new Date()).getTime(), id: fundid, name: fundname, price: fundprice, type: fundtype })
     setMyFunds(newFunds)
-    saveMyFunds(newFunds)
+    saveMyFunds(user.uid, newFunds)
     closeAddFundModal()
   }
 
@@ -121,7 +112,7 @@ function Home ({ user }) {
     let newFunds = [...myFunds]
     newFunds = newFunds.filter(f => f.key !== key)
     setMyFunds(newFunds)
-    saveMyFunds(newFunds)
+    saveMyFunds(user.uid, newFunds)
   }
 
   const showUpdateFundModal = (key) => {
@@ -137,7 +128,7 @@ function Home ({ user }) {
     const newFunds = [...myFunds]
     newFunds[updatedFundIndex] = { key, id, name, price, type }
     setMyFunds(newFunds)
-    saveMyFunds(newFunds)
+    saveMyFunds(user.uid, newFunds)
     closeUpdateFundModal()
   }
 
@@ -151,7 +142,7 @@ function Home ({ user }) {
   }
 
   const exportMyFunds = async () => {
-    const fundJson = JSON.stringify(await loadMyFunds())
+    const fundJson = JSON.stringify(await loadMyFunds(user.uid))
     copyTextToClipboard(fundJson)
   }
 
@@ -199,26 +190,9 @@ function Home ({ user }) {
   const importMyFunds = (values) => {
     const { fundlist } = values
     const localFunds = JSON.parse(fundlist.trim())
-    saveMyFunds(localFunds)
+    saveMyFunds(user.uid, localFunds)
     setMyFunds(localFunds)
     closeImportFundModal()
-  }
-
-  const login = async () => {
-    window.localStorage.setItem('userName', userName)
-    setIsLogin(true)
-    setMyFunds(await loadMyFunds())
-  }
-
-  const logout = async () => {
-    setIsLogin(false)
-    setMyFunds([])
-    setFundDetails([])
-  }
-
-  const userNameChanged = (e) => {
-    const loginUserName = e.target.value
-    setUserName(loginUserName ? loginUserName.toLowerCase() : '')
   }
 
   return (
@@ -230,79 +204,64 @@ function Home ({ user }) {
 
       <h1>基金損益表</h1>
 
-      <div>
-        <Space>
+      <>
 
-          <Input value={userName} onPressEnter={login} disabled={isLogin} placeholder='請輸入您的帳號' onChange={userNameChanged} />
-          {isLogin
-            ? <Button type='button' onClick={logout}>登出</Button>
-            : <Button type='button' onClick={login}>登入</Button>}
+        <div>
 
-        </Space>
+          {/* 功能鍵區塊 */}
+          <Space>
+            <Button type='button' onClick={exportMyFunds}>匯出</Button>
+            <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
+            <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
+          </Space>
+        </div>
 
-      </div>
+        <br />
 
-      <br />
+        {/* 基金清單 */}
+        <div>
 
-      {isLogin &&
-        <>
+          <table className='fund-table'>
 
-          <div>
+            <thead>
+              <tr>
+                <th>基金名稱</th>
+                <th>申購淨值</th>
+                <th>參考淨值</th>
+                <th>報酬率</th>
+                <th />
+              </tr>
+            </thead>
 
-            {/* 功能鍵區塊 */}
-            <Space>
-              <Button type='button' onClick={exportMyFunds}>匯出</Button>
-              <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
-              <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
-            </Space>
-          </div>
+            <tbody>
 
-          <br />
-
-          {/* 基金清單 */}
-          <div>
-
-            <table className='fund-table'>
-
-              <thead>
-                <tr>
-                  <th>基金名稱</th>
-                  <th>申購淨值</th>
-                  <th>參考淨值</th>
-                  <th>報酬率</th>
-                  <th />
-                </tr>
-              </thead>
-
-              <tbody>
-
-                {!isLoading && fundDetails && fundDetails.map(f => {
-                  return (
-                    <tr key={f.key}>
-                      <td>{f.name}</td>
-                      <td>{f.price}</td>
-                      <td>{f.currentPrice}</td>
-                      <td className={f.returnRate > 0 ? 'red' : 'green'}>{f.returnRate}%</td>
-                      <td>
-                        <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                        <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
-                      </td>
-                    </tr>
-                  )
-                })}
-
-                {isLoading && (
-                  <tr>
-                    <td colSpan='5'> 資料讀取中... </td>
+              {!isLoading && fundDetails && fundDetails.map(f => {
+                return (
+                  <tr key={f.key}>
+                    <td>{f.name}</td>
+                    <td>{f.price}</td>
+                    <td>{f.currentPrice}</td>
+                    <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
+                    <td>
+                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
+                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                    </td>
                   </tr>
-                )}
+                )
+              })}
 
-              </tbody>
-            </table>
+              {isLoading && (
+                <tr>
+                  <td colSpan='5'> 資料讀取中... </td>
+                </tr>
+              )}
 
-          </div>
+            </tbody>
+          </table>
 
-        </>}
+        </div>
+
+      </>
 
       {/* 新增基金 */}
 

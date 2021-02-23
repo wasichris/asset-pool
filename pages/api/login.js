@@ -11,6 +11,7 @@ async function handler (req, res) {
   let returnData = { loginStatus: true, msg: '' }
 
   try {
+    // validate email & password with firebase
     const { user } = await firebase.auth().signInWithEmailAndPassword(email, password)
     returnData = { loginStatus: true, msg: '', userUid: user.uid }
 
@@ -18,8 +19,18 @@ async function handler (req, res) {
     req.session.set('user', { uid: user.uid, email })
     await req.session.save()
   } catch (error) {
+    let errorMsg = ''
+    switch (error.code) {
+      case 'auth/user-not-found':
+        errorMsg = '此用戶不存在'
+        break
+
+      default:
+        errorMsg = error.code + ':' + error.message
+    }
+
     console.log(error)
-    returnData = { loginStatus: false, msg: error.code + ':' + error.message, userUid: '' }
+    returnData = { loginStatus: false, msg: errorMsg, userUid: '' }
   }
 
   // parser

@@ -11,6 +11,10 @@ body {
   //   Helvetica Neue, sans-serif;
 }
 
+body {
+  background-color: $body-bg;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -27,21 +31,31 @@ body {
   justify-content: center;
 }
 
+.bg-light-grey {
+  background-color: $container-bg;
+}
+
+.red {
+  color: red;
+}
+
+.green {
+  color: green;
+}
+
 
 // ====== component =======
 
 .container {
-  max-width: 760px;
+  max-width: 1024px;
   min-height: 100vh;
   margin: 0 auto;
-  background-color: #f4f4f5;
 }
-
 
 .header {
   display: inline-block;
   width: 100%;
-  background-color: #005d78;
+  background-color: $header-bg;
   color: white;
   height: $header-height;
 

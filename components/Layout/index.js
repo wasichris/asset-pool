@@ -7,7 +7,7 @@ import { LogoutOutlined } from '@ant-design/icons'
 
 export const siteTitle = '基金收益'
 
-export default function Layout ({ children, user }) {
+export default function Layout ({ children, user, noBg }) {
   const [isLogin, setIsLogin] = useState(false)
   const router = useRouter()
 
@@ -22,7 +22,7 @@ export default function Layout ({ children, user }) {
   }
 
   return (
-    <div className='container'>
+    <div className={noBg ? 'container' : 'container bg-light-grey'}>
 
       <Head>
         <link rel='icon' type='image/png' href='/favicon.png' />

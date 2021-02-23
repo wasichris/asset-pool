@@ -5,6 +5,7 @@ import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import axios from 'axios'
+import Link from 'next/link'
 
 export default function Login (props) {
   const router = useRouter()
@@ -30,12 +31,12 @@ export default function Login (props) {
       console.log(userUid)
       router.push('/')
     } else {
-      message.error('成功失敗:' + msg)
+      message.error('登入失敗: ' + msg)
     }
   }
 
   return (
-    <Layout>
+    <Layout noBg>
 
       <Head>
         <title>Login</title>
@@ -89,7 +90,10 @@ export default function Login (props) {
               <Button type='primary' htmlType='submit' className='login-form-button'>
                 Log in
               </Button>
-              Or <a href='/register'>register now!</a>
+              Or
+              <Link href='/register'>
+                <a> register now!</a>
+              </Link>
             </Form.Item>
           </Form>
 
