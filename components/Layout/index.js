@@ -4,6 +4,7 @@ import { Button } from 'antd'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import { LogoutOutlined } from '@ant-design/icons'
+import firebase from 'firebase/app'
 
 export const siteTitle = '基金收益'
 
@@ -18,6 +19,7 @@ export default function Layout ({ children, user, noBg }) {
   const handleLogout = async () => {
     const url = '/api/logout'
     await axios.post(url)
+    await firebase.auth().signOut() // oh no
     router.push('/login')
   }
 
