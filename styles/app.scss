@@ -6,8 +6,9 @@ html,
 body {
   padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
-    Helvetica Neue, sans-serif;
+  font-family: "Arial", "微軟正黑體", sans-serif;
+  // font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+  //   Helvetica Neue, sans-serif;
 }
 
 * {
@@ -25,6 +26,80 @@ body {
   align-items: center;
   justify-content: center;
 }
+
+
+// ====== component =======
+
+.container {
+  max-width: 760px;
+  min-height: 100vh;
+  margin: 0 auto;
+  background-color: #f4f4f5;
+}
+
+
+.header {
+  display: inline-block;
+  width: 100%;
+  background-color: #005d78;
+  color: white;
+  height: $header-height;
+
+  &__logo {
+    display: inline-block;
+    padding: 5px 20px;
+    font-weight: bold;
+    line-height:  $header-height - 5px - 5px ;
+    font-size: 20px;
+  }
+
+  &__username {
+    @include clearfix();
+    float: right;
+    line-height: $header-height;
+    margin: 0 10px;
+  }
+
+  &__logout {
+    @include clearfix();
+    float: right;
+    line-height: $header-height;
+    margin: 0 20px 0 10px;
+  }
+
+  &__logout-text {
+    @include phone() {
+      display: none !important;
+    }
+  }
+}
+
+.main {
+  padding: 20px 20px;
+}
+
+
+.fund-table {
+  font-family: 微軟正黑體; 
+  font-size:16px; 
+  border:1px solid #000;
+  border-collapse:collapse;
+  width: 100%;
+
+  th { 
+    background-color: #009FCC;
+    padding:10px;
+    border:1px solid #000;
+    color:#fff;
+  } 
+
+  td { 
+    border:1px solid #000;
+    padding:5px;
+  } 
+
+}
+
 
 
 .ant-card.login-card {

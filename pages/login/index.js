@@ -2,9 +2,9 @@ import Head from 'next/head'
 import Layout from '../../components/Layout'
 import { Card, Form, Input, Button, Checkbox, message } from 'antd'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
-import firebase from 'firebase/app'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import axios from 'axios'
 
 export default function Login (props) {
   const router = useRouter()
@@ -17,24 +17,21 @@ export default function Login (props) {
     }
   }, [form])
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     console.log('Success:', values)
     const { email, password, remember } = values
 
     window.localStorage.setItem('userMail', remember ? email : '')
 
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user
-        console.log(user)
-        message.info('成功登入')
-        router.push('/fund')
-        // ...
-      })
-      .catch((error) => {
-        message.error(error.code + ':' + error.message)
-      })
+    const url = '/api/login'
+    const { data: { loginStatus, msg, userUid } } = await axios.post(url, { email, password })
+    if (loginStatus) {
+      message.info('成功登入')
+      console.log(userUid)
+      router.push('/')
+    } else {
+      message.error('成功失敗:' + msg)
+    }
   }
 
   return (

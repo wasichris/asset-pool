@@ -1,24 +1,28 @@
 import Head from 'next/head'
-import styles from './layout.module.scss'
-import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import { Button } from 'antd'
+import axios from 'axios'
+import { useRouter } from 'next/router'
+import { LogoutOutlined } from '@ant-design/icons'
 
 export const siteTitle = '基金收益'
 
-export default function Layout ({ children, isNeedLogin }) {
-  const [isValidUser, setIsValidUser] = useState(false)
+export default function Layout ({ children, user }) {
+  const [isLogin, setIsLogin] = useState(false)
+  const router = useRouter()
 
   useEffect(() => {
-    if (isNeedLogin) {
-      const isPass = false
-      setIsValidUser(isPass)
-    } else {
-      setIsValidUser(true)
-    }
-  }, [isNeedLogin])
+    setIsLogin(!!user)
+  }, [user])
+
+  const handleLogout = async () => {
+    const url = '/api/logout'
+    await axios.post(url)
+    router.push('/login')
+  }
 
   return (
-    <div className={styles.container}>
+    <div className='container'>
 
       <Head>
         <link rel='icon' type='image/png' href='/favicon.png' />
@@ -33,15 +37,28 @@ export default function Layout ({ children, isNeedLogin }) {
         <meta name='twitter:card' content='summary_large_image' />
       </Head>
 
-      {
-        isValidUser
-          ? <>{children}</>
-          : (
-            <Link href='/login'>
-              <a>Back to Login Page</a>
-            </Link>
-            )
-      }
+      {isLogin &&
+        <div className='header'>
+
+          <div className='header__logo'>
+            <span>Asset Pool</span>
+          </div>
+
+          <div className='header__logout'>
+            <Button onClick={handleLogout} size='small' icon={<LogoutOutlined />}>
+              <span className='header__logout-text'> Logout </span>
+            </Button>
+          </div>
+
+          <div className='header__username'>
+            {user.email}
+          </div>
+
+        </div>}
+
+      <div className='main'>
+        {children}
+      </div>
 
     </div>
   )

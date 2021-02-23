@@ -26,6 +26,8 @@ export default function Funds (props) {
   // https://medium.com/frontend-digest/why-is-window-not-defined-in-nextjs-44daf7b4604e
   useEffect(() => {
     // setMyFunds(loadMyFunds())
+    // const loginUser = firebase.auth().currentUser
+    // console.log('%c loginUser ', 'background-color: #3A88AE; color: white;font-size: 14px; font-weight: bold;', loginUser)
 
     const localUserName = window.localStorage.getItem('userName')
     if (localUserName) {

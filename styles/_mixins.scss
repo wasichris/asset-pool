@@ -1,5 +1,33 @@
-@mixin size($size) {
-    width: $size;
-    height: $size;
+// break point
+
+@mixin pad {
+  @media (max-width: 768px) {
+    @content;
   }
-  
+}
+
+@mixin phone {
+  @media (max-width: 480px) {
+    @content;
+  }
+}
+
+// size
+@mixin size($w, $h) {
+  width: $w;
+  height: $h;
+}
+
+
+// common
+@mixin clearfix {
+  &:before,
+  &:after {
+      content: "";
+      display: table;
+  }
+  &:after {
+      clear: both;
+      overflow: hidden;
+  }
+}

@@ -22,7 +22,7 @@ const firebaseConfig = {
 }
 
 const initFirebase = () => {
-  // https://stackoverflow.com/questions/43331011/firebase-app-named-default-already-exists-app-duplicate-app
+  // preventing Next.js from accidentally re-initalizing your SDK when Next.js hot reloads your application!
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig)
   } else {
