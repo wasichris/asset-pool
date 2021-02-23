@@ -12,7 +12,7 @@ async function handler (req, res) {
 
   try {
     // validate email & password with firebase
-    const { user } = await firebase.auth().signInWithEmailAndPassword(email, password)
+    const { user } = await firebase.default.auth().signInWithEmailAndPassword(email, password)
     returnData = { loginStatus: true, msg: '', userUid: user.uid }
 
     // login success and keep data in session
