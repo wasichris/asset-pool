@@ -4,8 +4,12 @@
 // has the following format:
 import firebase from 'firebase/app'
 import { withIronSession } from 'next-iron-session'
+import firebaseHelper from '../../helpers/firebaseHelper.js'
 
 async function handler (req, res) {
+  // 初始 firebase
+  firebaseHelper.initFirebase() // oh no
+
   // req data
   try {
     const user = req.session.get('user')

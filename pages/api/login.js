@@ -8,7 +8,7 @@ import firebaseHelper from '../../helpers/firebaseHelper.js'
 
 async function handler (req, res) {
   // 初始 firebase
-  firebaseHelper.initFirebase()
+  firebaseHelper.initFirebase() // oh no
 
   // req data
   const { body: { email, password } } = req
@@ -17,6 +17,7 @@ async function handler (req, res) {
   try {
     // validate email & password with firebase
     const { user } = await firebase.auth().signInWithEmailAndPassword(email, password)
+    console.log('%c user ', 'background-color: #3A88AE; color: white;font-size: 14px; font-weight: bold;', user)
     returnData = { loginStatus: true, msg: '', userUid: user.uid }
 
     // login success and keep data in session
