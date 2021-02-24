@@ -19,8 +19,6 @@ body {
   box-sizing: border-box;
 }
 
-
-
 // ====== utils =======
 
 .center-wraper {
@@ -43,7 +41,6 @@ body {
   color: green;
 }
 
-
 // ====== component =======
 
 .container {
@@ -63,7 +60,7 @@ body {
     display: inline-block;
     padding: 5px 20px;
     font-weight: bold;
-    line-height:  $header-height - 5px - 5px ;
+    line-height: $header-height - 5px - 5px;
     font-size: 20px;
   }
 
@@ -92,29 +89,65 @@ body {
   padding: 20px 20px;
 }
 
+.fund-list {
 
-.fund-table {
-  font-family: 微軟正黑體; 
-  font-size:16px; 
-  border:1px solid #000;
-  border-collapse:collapse;
-  width: 100%;
+  @include phone() {
+    display: block;
+  }
 
-  th { 
-    background-color: #009FCC;
-    padding:10px;
-    border:1px solid #000;
-    color:#fff;
-  } 
+  display: none;
+  background-color: white;
 
-  td { 
-    border:1px solid #000;
-    padding:5px;
-  } 
+  &__item {
+    display: inline-block;
+    width: 100%;
+  }
 
+  &__field {
+    display: inline-block;
+    width: 50%;
+
+    &--tall {
+      height: 50px;
+      line-height: 50px;
+    }
+  }
+
+  &__rate {
+    font-weight: bold;
+    font-size: 15px;
+    border: 1px solid;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
 }
 
+.fund-table {
 
+  @include phone() {
+    display: none !important;
+  }
+
+  font-family: 微軟正黑體;
+  font-size: 16px;
+  border: 1px solid #000;
+  border-collapse: collapse;
+  width: 100%;
+  background-color: white;
+
+
+  th {
+    background-color: #009fcc;
+    padding: 10px;
+    border: 1px solid #000;
+    color: #fff;
+  }
+
+  td {
+    border: 1px solid #000;
+    padding: 5px;
+  }
+}
 
 .ant-card.login-card {
   width: 100%;
@@ -125,15 +158,13 @@ body {
     width: 100%;
   }
 
-  .site-form-item-icon{
+  .site-form-item-icon {
     color: rgba(0, 0, 0, 0.25);
     margin-right: 5px;
   }
 }
 
-
 .ant-card.register-card {
   width: 100%;
   max-width: 500px;
 }
-

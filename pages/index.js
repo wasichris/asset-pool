@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import axios from 'axios'
-import { Modal, Button, Input, Form, InputNumber, message, Select, Space } from 'antd'
+import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography } from 'antd'
 import firebase from 'firebase/app'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
@@ -234,7 +234,38 @@ function Home () {
 
       <br />
 
-      {/* 基金清單 */}
+      {/* 基金清單 - mobile */}
+
+      <List
+        className='fund-list'
+        bordered
+        loading={isLoading}
+        dataSource={fundDetails}
+        renderItem={f => (
+          <List.Item>
+
+            <div className='fund-list__item'>
+              <Typography.Title level={5}>{f.name}</Typography.Title>
+
+              <div className='fund-list__field'>申購淨值: {f.price}</div>
+              <div className='fund-list__field'>參考淨值: {f.currentPrice}</div>
+              <div className='fund-list__field fund-list__field--tall'>
+                報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'red' : 'green')}>{f.returnRate}%</span>
+              </div>
+              <div className='fund-list__field'>
+                <Space>
+                  <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
+                  <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                </Space>
+              </div>
+
+            </div>
+
+          </List.Item>
+        )}
+      />
+
+      {/* 基金清單 - pc */}
       <div>
 
         <table className='fund-table'>
@@ -259,8 +290,10 @@ function Home () {
                   <td>{f.currentPrice}</td>
                   <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
                   <td>
-                    <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                    <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                    <Space>
+                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
+                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                    </Space>
                   </td>
                 </tr>
               )
