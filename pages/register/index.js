@@ -59,12 +59,30 @@ export default function Register (props) {
           nickname
         }).then(() => {
           // 儲存成功後顯示訊息
-          message.info('User created successfully')
+          message.info('註冊用戶成功，請登入系統。')
           router.push('/login')
         })
-      }).catch(err => {
+      }).catch(error => {
         // 註冊失敗時顯示錯誤訊息
-        message.error(err.message)
+        let errorMsg = ''
+        switch (error.code) {
+          case 'auth/invalid-email':
+            errorMsg = '電子信箱格式錯誤'
+            break
+          case 'auth/email-already-in-use':
+            errorMsg = '此電子信箱用戶已存在'
+            break
+          case 'auth/operation-not-allowed':
+            errorMsg = '未啟用 email/password 授權機制 (系統設置)'
+            break
+          case 'auth/weak-password':
+            errorMsg = '密碼強度不足'
+            break
+
+          default:
+            errorMsg = error.code + ':' + error.message
+        }
+        message.error('註冊失敗: ' + errorMsg)
       })
   }
 

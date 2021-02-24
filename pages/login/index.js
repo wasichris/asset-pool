@@ -49,8 +49,17 @@ export default function Login (props) {
     } catch (error) {
       let errorMsg = ''
       switch (error.code) {
+        case 'auth/invalid-email':
+          errorMsg = '電子信箱格式錯誤'
+          break
+        case 'auth/user-disabled':
+          errorMsg = '此用戶已失效'
+          break
         case 'auth/user-not-found':
           errorMsg = '此用戶不存在'
+          break
+        case 'auth/wrong-password':
+          errorMsg = '密碼錯誤'
           break
 
         default:
