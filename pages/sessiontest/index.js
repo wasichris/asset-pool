@@ -2,20 +2,7 @@ import Head from 'next/head'
 import Layout from '../../components/Layout'
 import { withIronSession } from 'next-iron-session'
 
-function SessionTest (/* { user } */) {
-  // const dosomthing = () => {
-  //   // const url = '/api/login'
-  //   // const { data: { loginStatus, msg, userUid } } = await axios.post(url, { email, password })
-  //   // if (loginStatus) {
-  //   //   message.info('成功登入')
-  //   //   await firebase.auth().signInWithEmailAndPassword(email, password) // oh no
-  //   //   console.log(userUid)
-  //   //   router.push('/')
-  //   // } else {
-  //   //   message.error('登入失敗: ' + msg)
-  //   // }
-  // }
-
+function SessionTest ({ user }) {
   return (
     <Layout>
 
@@ -24,7 +11,8 @@ function SessionTest (/* { user } */) {
       </Head>
 
       <h1>Session Test</h1>
-
+      <div>call api/hello?name=xxxx to save name:xxx as user in session</div>
+      <div>current user.name = {user && user.name}</div>
     </Layout>
   )
 }

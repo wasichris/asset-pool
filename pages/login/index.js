@@ -26,7 +26,6 @@ export default function Login (props) {
       // validate email & password with firebase  (僅作驗證，若要在後端存取資料是使用 firebase admin SDK)
       await firebase.auth().signInWithEmailAndPassword(email, password)
       window.localStorage.setItem('userMail', remember ? email : '')
-      message.info('成功登入')
       router.push('/')
     } catch (error) {
       let errorMsg = ''
