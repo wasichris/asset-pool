@@ -6,6 +6,7 @@ import { Modal, Button, Input, Form, InputNumber, message, Select, Space } from 
 import firebase from 'firebase/app'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
+import debounce from 'lodash/debounce'
 
 const { Option } = Select
 const { TextArea } = Input
@@ -149,14 +150,14 @@ function Home () {
     closeUpdateFundModal()
   }
 
-  const onSelectSearch = async (val) => {
+  const onSelectSearch = debounce(async (val) => {
     if (val && val.length > 0) {
       const url = '/api/fundquery?name=' + val
       const { data } = await axios.get(url)
       const options = data.map(d => ({ name: d.name, id: d.id, type: d.type }))
       setFundOptions(options)
     }
-  }
+  }, 800)
 
   const exportMyFunds = async () => {
     const fundJson = JSON.stringify(await loadMyFunds(user.uid))
