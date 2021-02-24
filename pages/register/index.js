@@ -90,11 +90,11 @@ export default function Register (props) {
     <Layout noBg>
 
       <Head>
-        <title>Register</title>
+        <title>註冊</title>
       </Head>
 
       <div className='center-wraper'>
-        <Card title='Asset Pool - Register' className='register-card'>
+        <Card title='Asset Pool - 註冊' className='register-card'>
           <Form
             {...formItemLayout}
             form={form}
@@ -107,14 +107,8 @@ export default function Register (props) {
               name='email'
               label='E-mail'
               rules={[
-                {
-                  type: 'email',
-                  message: 'The input is not valid E-mail!'
-                },
-                {
-                  required: true,
-                  message: 'Please input your E-mail!'
-                }
+                { type: 'email', message: '格式錯誤' },
+                { required: true, message: '請輸入電子信箱' }
               ]}
             >
               <Input />
@@ -122,11 +116,11 @@ export default function Register (props) {
 
             <Form.Item
               name='password'
-              label='Password'
+              label='密碼'
               rules={[
                 {
                   required: true,
-                  message: 'Please input your password!'
+                  message: '請輸入密碼!'
                 },
                 ({ getFieldValue }) => ({
                   validator (_, value) {
@@ -134,7 +128,7 @@ export default function Register (props) {
                       return Promise.resolve()
                     }
                     // eslint-disable-next-line prefer-promise-reject-errors
-                    return Promise.reject('Password should be at least 6 characters')
+                    return Promise.reject('請輸入至少 6 個字元')
                   }
                 })
               ]}
@@ -145,13 +139,13 @@ export default function Register (props) {
 
             <Form.Item
               name='confirm'
-              label='Confirm Password'
+              label='確認密碼'
               dependencies={['password']}
               hasFeedback
               rules={[
                 {
                   required: true,
-                  message: 'Please confirm your password!'
+                  message: '請輸入確認密碼'
                 },
                 ({ getFieldValue }) => ({
                   validator (_, value) {
@@ -159,7 +153,7 @@ export default function Register (props) {
                       return Promise.resolve()
                     }
                     // eslint-disable-next-line prefer-promise-reject-errors
-                    return Promise.reject('The two passwords that you entered do not match!')
+                    return Promise.reject('密碼不一致')
                   }
                 })
               ]}
@@ -171,20 +165,20 @@ export default function Register (props) {
               name='nickname'
               label={
                 <span>
-                  Nickname&nbsp;
-                  <Tooltip title='What do you want others to call you?'>
+                  暱稱&nbsp;
+                  <Tooltip title='大家都怎麼稱呼你?'>
                     <QuestionCircleOutlined />
                   </Tooltip>
                 </span>
               }
-              rules={[{ required: true, message: 'Please input your nickname!', whitespace: true }]}
+              rules={[{ required: true, message: '請輸入暱稱', whitespace: true }]}
             >
               <Input />
             </Form.Item>
 
             <Form.Item {...tailFormItemLayout}>
               <Button type='primary' htmlType='submit'>
-                Register
+                註冊
               </Button>
             </Form.Item>
           </Form>

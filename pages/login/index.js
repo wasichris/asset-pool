@@ -69,6 +69,32 @@ export default function Login (props) {
     }
   }
 
+  const handleForgetPwd = () => {
+    const email = form.getFieldValue('email')
+    if (email) {
+      firebase.auth().sendPasswordResetEmail(email)
+        .then(function () {
+          message.info('密碼重設信件已寄出，請依照信中連結進行重設。')
+        })
+        .catch(function (error) {
+          let errorMsg = ''
+          switch (error.code) {
+            case 'auth/invalid-email':
+              errorMsg = '電子信箱格式錯誤'
+              break
+            case 'auth/user-not-found':
+              errorMsg = '此用戶不存在'
+              break
+            default:
+              errorMsg = error.code + ':' + error.message
+          }
+          message.error('忘記密碼: ' + errorMsg)
+        })
+    } else {
+      message.warn('請輸入電子信箱')
+    }
+  }
+
   return (
     <Layout noBg>
 
@@ -77,7 +103,7 @@ export default function Login (props) {
       </Head>
 
       <div className='center-wraper'>
-        <Card title='Asset Pool - Login' className='login-card'>
+        <Card title='Asset Pool - 登入' className='login-card'>
 
           <Form
             name='normal_login'
@@ -90,14 +116,8 @@ export default function Login (props) {
             <Form.Item
               name='email'
               rules={[
-                {
-                  type: 'email',
-                  message: 'The input is not valid E-mail!'
-                },
-                {
-                  required: true,
-                  message: 'Please input your E-mail!'
-                }
+                { type: 'email', message: '格式錯誤' },
+                { required: true, message: '請輸入電子信箱' }
               ]}
             >
 
@@ -112,7 +132,7 @@ export default function Login (props) {
 
             <Form.Item
               name='password'
-              rules={[{ required: true, message: 'Please input your Password!' }]}
+              rules={[{ required: true, message: '請輸入密碼' }]}
             >
               <Input
                 prefix={<LockOutlined className='site-form-item-icon' />}
@@ -123,18 +143,19 @@ export default function Login (props) {
             </Form.Item>
             <Form.Item>
               <Form.Item name='remember' valuePropName='checked' noStyle>
-                <Checkbox>Remember me</Checkbox>
+                <Checkbox>記住我的帳號</Checkbox>
               </Form.Item>
             </Form.Item>
 
             <Form.Item>
               <Button type='primary' htmlType='submit' className='login-form-button'>
-                Log in
+                登入
               </Button>
-              Or
               <Link href='/register'>
-                <a> register now!</a>
+                <a> 立即註冊 </a>
               </Link>
+              或
+              <a onClick={handleForgetPwd}> 忘記密碼</a>
             </Form.Item>
           </Form>
 
