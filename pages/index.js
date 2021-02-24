@@ -252,7 +252,7 @@ function Home () {
               <div className='fund-list__field fund-list__field--tall'>
                 報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'red' : 'green')}>{f.returnRate}%</span>
               </div>
-              <div className='fund-list__field'>
+              <div className='fund-list__field fund-list__field--tall'>
                 <Space>
                   <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
                   <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
