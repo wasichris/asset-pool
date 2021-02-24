@@ -12,7 +12,6 @@ export default function App ({ Component, pageProps }) {
   // 初始 firebase
   firebaseHelper.initFirebase()
 
-  console.log((new Date()).toString())
   return (
     <>
       {/* 整個APP共用的畫面可以擺在這邊喔!! */}

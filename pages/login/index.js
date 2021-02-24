@@ -4,7 +4,7 @@ import { Card, Form, Input, Button, Checkbox, message } from 'antd'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 import Link from 'next/link'
 import firebase from 'firebase/app'
 
@@ -20,20 +20,25 @@ export default function Login (props) {
   }, [form])
 
   const onFinish = async (values) => {
-    console.log('Success:', values)
     const { email, password, remember } = values
 
-    window.localStorage.setItem('userMail', remember ? email : '')
-
-    const url = '/api/login'
-    const { data: { loginStatus, msg, userUid } } = await axios.post(url, { email, password })
-    if (loginStatus) {
+    try {
+      // validate email & password with firebase  (僅作驗證，若要在後端存取資料是使用 firebase admin SDK)
+      await firebase.auth().signInWithEmailAndPassword(email, password)
+      window.localStorage.setItem('userMail', remember ? email : '')
       message.info('成功登入')
-      await firebase.auth().signInWithEmailAndPassword(email, password) // oh no
-      console.log(userUid)
       router.push('/')
-    } else {
-      message.error('登入失敗: ' + msg)
+    } catch (error) {
+      let errorMsg = ''
+      switch (error.code) {
+        case 'auth/user-not-found':
+          errorMsg = '此用戶不存在'
+          break
+
+        default:
+          errorMsg = error.code + ':' + error.message
+      }
+      message.error('登入失敗: ' + errorMsg)
     }
   }
 

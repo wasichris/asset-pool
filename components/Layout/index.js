@@ -1,27 +1,22 @@
 import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import { Button } from 'antd'
-import axios from 'axios'
 import { useRouter } from 'next/router'
 import { LogoutOutlined } from '@ant-design/icons'
 import firebase from 'firebase/app'
 
 export const siteTitle = '基金收益'
 
-export default function Layout ({ children, user, noBg }) {
-  const [isLogin, setIsLogin] = useState(false)
+export default function Layout ({ children, user, noBg, isHide }) {
+  const [hasHeader, setHasHeader] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
-    setIsLogin(!!user)
+    setHasHeader(!!user)
   }, [user])
 
   const handleLogout = async () => {
-    const url = '/api/logout'
-    await axios.post(url)
-    const uu = firebase.auth().currentUser // oh no
-    console.log('=========== logout ===========', uu) // oh no
-    await firebase.auth().signOut() // oh no
+    await firebase.auth().signOut()
     router.push('/login')
   }
 
@@ -41,28 +36,31 @@ export default function Layout ({ children, user, noBg }) {
         <meta name='twitter:card' content='summary_large_image' />
       </Head>
 
-      {isLogin &&
-        <div className='header'>
+      {!isHide &&
+        <>
+          {hasHeader &&
+            <div className='header'>
 
-          <div className='header__logo'>
-            <span>Asset Pool</span>
+              <div className='header__logo'>
+                <span>Asset Pool</span>
+              </div>
+
+              <div className='header__logout'>
+                <Button onClick={handleLogout} size='small' icon={<LogoutOutlined />}>
+                  <span className='header__logout-text'> Logout </span>
+                </Button>
+              </div>
+
+              <div className='header__username'>
+                {user.email}
+              </div>
+
+            </div>}
+
+          <div className='main'>
+            {children}
           </div>
-
-          <div className='header__logout'>
-            <Button onClick={handleLogout} size='small' icon={<LogoutOutlined />}>
-              <span className='header__logout-text'> Logout </span>
-            </Button>
-          </div>
-
-          <div className='header__username'>
-            {user.email}
-          </div>
-
-        </div>}
-
-      <div className='main'>
-        {children}
-      </div>
+        </>}
 
     </div>
   )

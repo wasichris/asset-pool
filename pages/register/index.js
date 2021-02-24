@@ -42,8 +42,6 @@ export default function Register (props) {
   const [form] = Form.useForm()
 
   const onFinish = (values) => {
-    console.log('Received values of form: ', values)
-
     const { email, password, nickname } = values
 
     // 透過 auth().createUserWithEmailAndPassword 建立使用者

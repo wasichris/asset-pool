@@ -5,12 +5,15 @@ import axios from 'axios'
 import { Modal, Button, Input, Form, InputNumber, message, Select, Space } from 'antd'
 import firebase from 'firebase/app'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
-import { withIronSession } from 'next-iron-session'
+import { useRouter } from 'next/router'
 
 const { Option } = Select
 const { TextArea } = Input
 
-function Home ({ user }) {
+function Home () {
+  const [isLogin, setIsLogin] = useState(false)
+  const [user, setUser] = useState(null)
+
   const [isShowAddFundModal, setIsShowAddFundModal] = useState(false)
   const [isShowImportFundModal, setIsShowImportFundModal] = useState(false)
   const [fundDetails, setFundDetails] = useState([])
@@ -20,21 +23,35 @@ function Home ({ user }) {
   const [targetUpdateFund, setTargetUpdateFund] = useState({})
   const [isShowUpdateFundModal, setIsShowUpdateFundModal] = useState(false)
   const [form] = Form.useForm()
+  const router = useRouter()
+
+  useEffect(() => {
+    const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+      if (user) {
+        setIsLogin(true)
+        setUser({ uid: user.uid, email: user.email })
+      } else {
+        router.push('/login')
+      }
+    })
+
+    return function cleanup () {
+      unsubscribe()
+    }
+  }, [router])
 
   useEffect(() => {
     async function setupMyFunds () {
-      setMyFunds(await loadMyFunds(user.uid))
+      if (user) {
+        setMyFunds(await loadMyFunds(user.uid))
+      }
     }
 
     setupMyFunds()
-  }, [user.uid])
+  }, [user])
 
   useEffect(() => {
     async function fetchData () {
-      // if (myFunds == null || myFunds.length === 0) {
-      //   return
-      // }
-
       const newFundDetails = []
       const apiResonses = []
 
@@ -196,7 +213,7 @@ function Home ({ user }) {
   }
 
   return (
-    <Layout user={user}>
+    <Layout user={user} isHide={isLogin === false}>
 
       <Head>
         <title>基金損益表</title>
@@ -204,64 +221,60 @@ function Home ({ user }) {
 
       <h1>基金損益表</h1>
 
-      <>
+      <div>
 
-        <div>
+        {/* 功能鍵區塊 */}
+        <Space>
+          <Button type='button' onClick={exportMyFunds}>匯出</Button>
+          <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
+          <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
+        </Space>
+      </div>
 
-          {/* 功能鍵區塊 */}
-          <Space>
-            <Button type='button' onClick={exportMyFunds}>匯出</Button>
-            <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
-            <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
-          </Space>
-        </div>
+      <br />
 
-        <br />
+      {/* 基金清單 */}
+      <div>
 
-        {/* 基金清單 */}
-        <div>
+        <table className='fund-table'>
 
-          <table className='fund-table'>
+          <thead>
+            <tr>
+              <th>基金名稱</th>
+              <th>申購淨值</th>
+              <th>參考淨值</th>
+              <th>報酬率</th>
+              <th />
+            </tr>
+          </thead>
 
-            <thead>
-              <tr>
-                <th>基金名稱</th>
-                <th>申購淨值</th>
-                <th>參考淨值</th>
-                <th>報酬率</th>
-                <th />
-              </tr>
-            </thead>
+          <tbody>
 
-            <tbody>
-
-              {!isLoading && fundDetails && fundDetails.map(f => {
-                return (
-                  <tr key={f.key}>
-                    <td>{f.name}</td>
-                    <td>{f.price}</td>
-                    <td>{f.currentPrice}</td>
-                    <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
-                    <td>
-                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
-                    </td>
-                  </tr>
-                )
-              })}
-
-              {isLoading && (
-                <tr>
-                  <td colSpan='5'> 資料讀取中... </td>
+            {!isLoading && fundDetails && fundDetails.map(f => {
+              return (
+                <tr key={f.key}>
+                  <td>{f.name}</td>
+                  <td>{f.price}</td>
+                  <td>{f.currentPrice}</td>
+                  <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
+                  <td>
+                    <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
+                    <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                  </td>
                 </tr>
-              )}
+              )
+            })}
 
-            </tbody>
-          </table>
+            {isLoading && (
+              <tr>
+                <td colSpan='5'> 資料讀取中... </td>
+              </tr>
+            )}
 
-        </div>
+          </tbody>
+        </table>
 
-      </>
+      </div>
 
       {/* 新增基金 */}
 
@@ -411,31 +424,5 @@ function Home ({ user }) {
     </Layout>
   )
 }
-
-export const getServerSideProps = withIronSession(
-  async ({ req, res }) => {
-    const user = req.session.get('user')
-
-    if (!user) {
-      res.setHeader('location', '/login')
-      res.statusCode = 302
-      res.end()
-
-      return { props: {} }
-    }
-
-    return {
-      props: { user }
-    }
-  },
-  {
-    password: process.env.APPLICATION_SECRET,
-    cookieName: process.env.APPLICATION_COOKIENAME,
-    // if your localhost is served on http:// then disable the secure flag
-    cookieOptions: {
-      secure: process.env.NODE_ENV === 'production'
-    }
-  }
-)
 
 export default Home

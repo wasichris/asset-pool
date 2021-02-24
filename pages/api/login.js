@@ -4,20 +4,15 @@
 // has the following format:
 import firebase from 'firebase/app'
 import { withIronSession } from 'next-iron-session'
-import firebaseHelper from '../../helpers/firebaseHelper.js'
 
 async function handler (req, res) {
-  // 初始 firebase
-  firebaseHelper.initFirebase() // oh no
-
   // req data
   const { body: { email, password } } = req
   let returnData = { loginStatus: true, msg: '' }
 
   try {
-    // validate email & password with firebase
+    // validate email & password with firebase  (僅作驗證，在後端存取資料是使用 firebase admin SDK)
     const { user } = await firebase.auth().signInWithEmailAndPassword(email, password)
-    console.log('%c user ', 'background-color: #3A88AE; color: white;font-size: 14px; font-weight: bold;', user)
     returnData = { loginStatus: true, msg: '', userUid: user.uid }
 
     // login success and keep data in session
