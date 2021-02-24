@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import Layout from '../components/Layout'
+import Layout from '../../components/Layout'
 import { withIronSession } from 'next-iron-session'
 
 function SessionTest (/* { user } */) {
