@@ -1,31 +1,50 @@
 import Head from 'next/head'
 import Layout from '../../components/Layout'
-import { Card, Form, Input, Button, Checkbox, message } from 'antd'
+import { Card, Form, Input, Button, Checkbox, message, AutoComplete } from 'antd'
 import { MailOutlined, LockOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-// import axios from 'axios'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import firebase from 'firebase/app'
 
 export default function Login (props) {
   const router = useRouter()
   const [form] = Form.useForm()
+  const [userMailList, setUserMailList] = useState([])
 
   useEffect(() => {
     const localUserMail = window.localStorage.getItem('userMail')
     if (localUserMail) {
-      form.setFieldsValue({ email: localUserMail })
+      form.setFieldsValue({ email: localUserMail.trim() })
+    }
+
+    const localUserMailList = window.localStorage.getItem('userMailList')
+    if (localUserMailList) {
+      setUserMailList(JSON.parse(localUserMailList.trim()))
     }
   }, [form])
 
-  const onFinish = async (values) => {
+  const handleLogin = async (values) => {
     const { email, password, remember } = values
 
     try {
-      // validate email & password with firebase  (僅作驗證，若要在後端存取資料是使用 firebase admin SDK)
+      // login firebase by email & password
       await firebase.auth().signInWithEmailAndPassword(email, password)
-      window.localStorage.setItem('userMail', remember ? email : '')
+
+      // remember mail info in local
+      if (remember) {
+        window.localStorage.setItem('userMail', email)
+        const isExist = userMailList.find(m => m.value.toLowerCase() === email.toLowerCase())
+        if (!isExist) {
+          const newUserMailList = [...userMailList, { value: email.toLowerCase() }]
+          setUserMailList(newUserMailList)
+          window.localStorage.setItem('userMailList', JSON.stringify(newUserMailList))
+        }
+      } else {
+        window.localStorage.setItem('userMail', '')
+        window.localStorage.setItem('userMailList', '')
+      }
+
       router.push('/')
     } catch (error) {
       let errorMsg = ''
@@ -55,7 +74,7 @@ export default function Login (props) {
             name='normal_login'
             className='login-form'
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={handleLogin}
             form={form}
           >
 
@@ -72,7 +91,14 @@ export default function Login (props) {
                 }
               ]}
             >
-              <Input prefix={<MailOutlined className='site-form-item-icon' />} placeholder='E-mail' size='large' />
+
+              <AutoComplete
+                options={userMailList}
+                filterOption={(inputValue, option) =>
+                  option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
+              >
+                <Input prefix={<MailOutlined className='site-form-item-icon' />} placeholder='E-mail' size='large' />
+              </AutoComplete>
             </Form.Item>
 
             <Form.Item
