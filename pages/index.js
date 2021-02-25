@@ -2,14 +2,34 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import axios from 'axios'
-import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography } from 'antd'
+import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography, DatePicker } from 'antd'
 import firebase from 'firebase/app'
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
+import moment from 'moment'
 
 const { Option } = Select
 const { TextArea } = Input
+
+const round = (value) => Math.round(value * 100) / 100
+
+const getReturnRateWithInterestPercentage = ({ price, currentPrice, amount, interest }) => {
+  if (price && currentPrice && amount && interest) {
+    const returnRate = (currentPrice - price) / price
+    const returnAmount = amount * returnRate
+    const returnRateWithInterest = (returnAmount + interest) / amount
+    return round(returnRateWithInterest * 100)
+  }
+
+  return ''
+}
+
+const formatCurrency = (num) => {
+  const parts = num.toString().split('.')
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  return parts.join('.')
+}
 
 function Home () {
   const [isLogin, setIsLogin] = useState(false)
@@ -71,13 +91,20 @@ function Home () {
             const { data } = response
             const fund = myFunds.find(f => f.key === data.key)
             if (fund) {
+              const { key, id, name, date, amount, price, interest } = fund
+              const currentPrice = data.price
               newFundDetails.push({
-                key: fund.key,
-                id: fund.id,
-                name: fund.name,
-                price: fund.price,
-                currentPrice: data.price,
-                returnRate: Math.round(((data.price - fund.price) / fund.price) * 10000) / 100
+                key: key,
+                id: id,
+                name: name,
+                date: date,
+                amount: amount,
+                price: price,
+                currentPrice: currentPrice,
+                returnRate: round(((currentPrice - price) / price) * 100),
+                returnAmount: amount ? round(amount * ((currentPrice - price) / price)) : '',
+                interest: interest,
+                returnRateWithInterest: getReturnRateWithInterestPercentage({ price, currentPrice, amount, interest })
               })
             }
           })
@@ -116,11 +143,11 @@ function Home () {
   }
 
   const addFund = (values) => {
-    const { fundid, fundprice } = values
+    const { fundid, price, date, amount } = values
     const fundname = fundOptions.find(f => f.id === fundid).name.trim()
     const fundtype = fundOptions.find(f => f.id === fundid).type.trim()
     const newFunds = [...myFunds]
-    newFunds.push({ key: fundid + '-' + (new Date()).getTime(), id: fundid, name: fundname, price: fundprice, type: fundtype })
+    newFunds.push({ key: fundid + '-' + (new Date()).getTime(), id: fundid, name: fundname, price, type: fundtype, date, amount })
     setMyFunds(newFunds)
     saveMyFunds(user.uid, newFunds)
     closeAddFundModal()
@@ -136,15 +163,15 @@ function Home () {
   const showUpdateFundModal = (key) => {
     const targetFund = myFunds.find(f => f.key === key)
     setTargetUpdateFund(targetFund)
-    form.setFieldsValue({ ...targetFund })
+    form.setFieldsValue({ ...targetFund, date: moment(targetFund.date) })
     setIsShowUpdateFundModal(true)
   }
 
   const updateFund = (values) => {
-    const { key, id, name, price, type } = values
+    const { key, id, name, price, type, date, amount, interest } = values
     const updatedFundIndex = myFunds.findIndex(myFund => myFund.key === key)
     const newFunds = [...myFunds]
-    newFunds[updatedFundIndex] = { key, id, name, price, type }
+    newFunds[updatedFundIndex] = { key, id, name, price, type, date: moment(date).format('YYYY-MM-DD'), amount, interest }
     setMyFunds(newFunds)
     saveMyFunds(user.uid, newFunds)
     closeUpdateFundModal()
@@ -246,12 +273,22 @@ function Home () {
 
             <div className='fund-list__item'>
               <Typography.Title level={5}>{f.name}</Typography.Title>
+              <div className='fund-list__field'>申購日期: {f.date ? `${f.date}` : '-'}</div>
+              <div className='fund-list__field'>投資金額: {f.amount ? `$${formatCurrency(f.amount)}` : '-'}</div>
+              <div className='fund-list__field'>申購淨值: ${formatCurrency(f.price)}</div>
+              <div className='fund-list__field'>參考淨值: ${formatCurrency(f.currentPrice)}</div>
+              <div className='fund-list__field'>投資損益: {f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</div>
+              <div className='fund-list__field'>累計配息: {f.interest ? `$${formatCurrency(f.interest)}` : '-'}</div>
 
-              <div className='fund-list__field'>申購淨值: {f.price}</div>
-              <div className='fund-list__field'>參考淨值: {f.currentPrice}</div>
-              <div className='fund-list__field fund-list__field--tall'>
+              <div className='fund-list__field'>
                 報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'red' : 'green')}>{f.returnRate}%</span>
               </div>
+
+              <div className='fund-list__field'>
+                含息報酬率: <span className={f.returnRateWithInterest !== '' ? ('fund-list__rate ' + (f.returnRateWithInterest >= 0 ? 'red' : 'green')) : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</span>
+
+              </div>
+
               <div className='fund-list__field fund-list__field--tall'>
                 <Space>
                   <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
@@ -272,10 +309,15 @@ function Home () {
 
           <thead>
             <tr>
-              <th>基金名稱</th>
-              <th>申購淨值</th>
-              <th>參考淨值</th>
+              <th style={{ width: '30%' }}>基金名稱</th>
+              <th>申購<br />日期</th>
+              <th>投資<br />金額</th>
+              <th>申購<br />淨值</th>
+              <th>參考<br />淨值</th>
+              <th>投資<br />損益</th>
               <th>報酬率</th>
+              <th>累計<br />配息</th>
+              <th>含息<br />報酬率</th>
               <th />
             </tr>
           </thead>
@@ -285,11 +327,17 @@ function Home () {
             {!isLoading && fundDetails && fundDetails.map(f => {
               return (
                 <tr key={f.key}>
-                  <td>{f.name}</td>
-                  <td>{f.price}</td>
-                  <td>{f.currentPrice}</td>
+                  <td style={{ textAlign: 'left' }}>{f.name}</td>
+                  <td style={{ textAlign: 'center' }}>{f.date || '-'}</td>
+                  <td>{f.amount ? `$${formatCurrency(f.amount)}` : '-'}</td>
+                  <td>${formatCurrency(f.price)}</td>
+                  <td>${formatCurrency(f.currentPrice)}</td>
+                  <td>{f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</td>
                   <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
-                  <td>
+                  <td>{f.interest ? `$${formatCurrency(f.interest)}` : '-'}</td>
+                  <td className={f.returnRateWithInterest !== '' ? (f.returnRateWithInterest >= 0 ? 'red' : 'green') : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</td>
+
+                  <td style={{ textAlign: 'center' }}>
                     <Space>
                       <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
                       <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
@@ -301,7 +349,7 @@ function Home () {
 
             {isLoading && (
               <tr>
-                <td colSpan='5'> 資料讀取中... </td>
+                <td colSpan='10' style={{ textAlign: 'left' }}> 資料讀取中... </td>
               </tr>
             )}
 
@@ -327,7 +375,7 @@ function Home () {
           <Form.Item
             label='基金名稱'
             name='fundid'
-            rules={[{ required: true, message: 'Please select your fundname!' }]}
+            rules={[{ required: true, message: '請選擇基金名稱' }]}
           >
             <Select
               showSearch
@@ -346,9 +394,25 @@ function Home () {
           </Form.Item>
 
           <Form.Item
+            label='投資日期'
+            name='date'
+            rules={[{ required: true, message: '請輸入投資日期' }]}
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item
+            label='投資金額'
+            name='amount'
+            rules={[{ required: true, message: '請輸入投資金額' }]}
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <Form.Item
             label='申購淨值'
-            name='fundprice'
-            rules={[{ required: true, message: 'Please input your fundprice!' }]}
+            name='price'
+            rules={[{ required: true, message: '請輸入申購淨值' }]}
           >
             <InputNumber />
           </Form.Item>
@@ -416,9 +480,33 @@ function Home () {
           </Form.Item>
 
           <Form.Item
+            label='投資日期'
+            name='date'
+            rules={[{ required: true, message: '請輸入投資日期' }]}
+          >
+            <DatePicker />
+          </Form.Item>
+
+          <Form.Item
+            label='投資金額'
+            name='amount'
+            rules={[{ required: true, message: '請輸入投資金額' }]}
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <Form.Item
             label='申購淨值'
             name='price'
-            rules={[{ required: true, message: 'Please input your fundprice!' }]}
+            rules={[{ required: true, message: '請輸入申購淨值' }]}
+          >
+            <InputNumber />
+          </Form.Item>
+
+          <Form.Item
+            label='累計配息'
+            name='interest'
+            rules={[{ required: true, message: '請輸入累計配息' }]}
           >
             <InputNumber />
           </Form.Item>
