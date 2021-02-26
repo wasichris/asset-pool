@@ -4,7 +4,7 @@ import Layout from '../components/Layout'
 import axios from 'axios'
 import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography, DatePicker } from 'antd'
 import firebase from 'firebase/app'
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons'
+import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons'
 import { useRouter } from 'next/router'
 import debounce from 'lodash/debounce'
 import moment from 'moment'
@@ -306,8 +306,8 @@ function Home () {
               <div className='fund-list__field'>參考日: {f.currentPriceRefDate}</div>
 
               <div className='fund-list__action'>
-                <Button type='link' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                <Button type='link' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                <Button type='link' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
+                <Button type='link' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
               </div>
 
             </div>
@@ -353,8 +353,8 @@ function Home () {
 
                   <td style={{ textAlign: 'center' }}>
                     <Space>
-                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
+                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
+                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
                     </Space>
                   </td>
                 </tr>
