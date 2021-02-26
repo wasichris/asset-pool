@@ -93,6 +93,7 @@ function Home () {
             if (fund) {
               const { key, id, name, date, amount, price, interest } = fund
               const currentPrice = data.price
+              const currentPriceRefDate = data.refdate
               newFundDetails.push({
                 key: key,
                 id: id,
@@ -101,6 +102,7 @@ function Home () {
                 amount: amount,
                 price: price,
                 currentPrice: currentPrice,
+                currentPriceRefDate: currentPriceRefDate,
                 returnRate: round(((currentPrice - price) / price) * 100),
                 returnAmount: amount ? round(amount * ((currentPrice - price) / price)) : '',
                 interest: interest,
@@ -286,14 +288,13 @@ function Home () {
 
               <div className='fund-list__field'>
                 含息報酬率: <span className={f.returnRateWithInterest !== '' ? ('fund-list__rate ' + (f.returnRateWithInterest >= 0 ? 'red' : 'green')) : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</span>
-
               </div>
 
-              <div className='fund-list__field fund-list__field--tall'>
-                <Space>
-                  <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
-                  <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
-                </Space>
+              <div className='fund-list__field'>參考日: {f.currentPriceRefDate}</div>
+
+              <div className='fund-list__action'>
+                <Button type='link' onClick={() => removeFund(f.key)} icon={<DeleteOutlined />} />
+                <Button type='link' onClick={() => showUpdateFundModal(f.key)} icon={<EditOutlined />} />
               </div>
 
             </div>

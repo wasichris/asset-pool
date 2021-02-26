@@ -22,5 +22,6 @@ export default async (req, res) => {
   // parser
   const $ = cheerio.load(data)
   const price = $('#article > form > table.t01 > tbody > tr:nth-child(2) > td:nth-child(2)').html()
-  res.status(200).json({ price: price ? parseFloat(price) : null, id, key })
+  const refdate = $('#article > form > table.t01 > tbody > tr:nth-child(2) > td:nth-child(1)').html()
+  res.status(200).json({ price: price ? parseFloat(price) : null, id, key, refdate })
 }
