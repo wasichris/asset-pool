@@ -1,6 +1,8 @@
 # Asset Pool #
 提供各基金即時價格，並具損益運算功能，方便統整各銀行購入之基金項目。 
 
+有需要的朋友可以至 [Asset Pool](https://asset-pool.vercel.app/ "Asset Pool")  註冊使用。
+
 <br>
 
 # Tech Stack #
