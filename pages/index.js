@@ -283,11 +283,11 @@ function Home () {
               <div className='fund-list__field'>累計配息: {f.interest ? `$${formatCurrency(f.interest)}` : '-'}</div>
 
               <div className='fund-list__field'>
-                報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'red' : 'green')}>{f.returnRate}%</span>
+                報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'up-color' : 'down-color')}>{f.returnRate}%</span>
               </div>
 
               <div className='fund-list__field'>
-                含息報酬率: <span className={f.returnRateWithInterest !== '' ? ('fund-list__rate ' + (f.returnRateWithInterest >= 0 ? 'red' : 'green')) : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</span>
+                含息報酬率: <span className={f.returnRateWithInterest !== '' ? ('fund-list__rate ' + (f.returnRateWithInterest >= 0 ? 'up-color' : 'down-color')) : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</span>
               </div>
 
               <div className='fund-list__field'>參考日: {f.currentPriceRefDate}</div>
@@ -334,9 +334,9 @@ function Home () {
                   <td>${formatCurrency(f.price)}</td>
                   <td>${formatCurrency(f.currentPrice)}</td>
                   <td>{f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</td>
-                  <td className={f.returnRate >= 0 ? 'red' : 'green'}>{f.returnRate}%</td>
+                  <td className={f.returnRate >= 0 ? 'up-color' : 'down-color'}>{f.returnRate}%</td>
                   <td>{f.interest ? `$${formatCurrency(f.interest)}` : '-'}</td>
-                  <td className={f.returnRateWithInterest !== '' ? (f.returnRateWithInterest >= 0 ? 'red' : 'green') : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</td>
+                  <td className={f.returnRateWithInterest !== '' ? (f.returnRateWithInterest >= 0 ? 'up-color' : 'down-color') : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</td>
 
                   <td style={{ textAlign: 'center' }}>
                     <Space>
