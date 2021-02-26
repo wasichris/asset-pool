@@ -19,13 +19,13 @@
 
 # Screenshots #
 登入系統  
-![登入系統](public/readme/mobile-login.png)  
+<img src="https://raw.githubusercontent.com/wasichris/asset-pool/main/public/readme/mobile-login.png" width="300px">
 
 註冊帳號  
-![登入系統](public/readme/mobile-register.png)  
+<img src="https://raw.githubusercontent.com/wasichris/asset-pool/main/public/readme/mobile-register.png" width="300px">
 
 主畫面 - mobile  
-![主畫面](public/readme/mobile-funds.png) 
+<img src="https://raw.githubusercontent.com/wasichris/asset-pool/main/public/readme/mobile-funds.png" width="300px">
 
 主畫面 - pc  
-![主畫面](public/readme/pc-funds.png) 
+<img src="https://raw.githubusercontent.com/wasichris/asset-pool/main/public/readme/pc-funds.png" width="800px">
