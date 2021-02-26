@@ -14,6 +14,15 @@ const { TextArea } = Input
 
 const round = (value) => Math.round(value * 100) / 100
 
+const getReturnRatePercentage = ({ price, currentPrice }) => {
+  if (price && currentPrice) {
+    const returnRate = (currentPrice - price) / price
+    return round(returnRate * 100)
+  }
+
+  return ''
+}
+
 const getReturnRateWithInterestPercentage = ({ price, currentPrice, amount, interest }) => {
   if (price && currentPrice && amount && interest) {
     const returnRate = (currentPrice - price) / price
@@ -107,8 +116,8 @@ function Home () {
                 price: price,
                 currentPrice: currentPrice,
                 currentPriceRefDate: currentPriceRefDate,
-                returnRate: round(((currentPrice - price) / price) * 100),
-                returnAmount: amount ? round(amount * ((currentPrice - price) / price)) : '',
+                returnRate: getReturnRatePercentage({ price, currentPrice }),
+                returnAmount: (amount && currentPrice) ? round(amount * ((currentPrice - price) / price)) : '',
                 interest: interest,
                 returnRateWithInterest: getReturnRateWithInterestPercentage({ price, currentPrice, amount, interest })
               })
@@ -282,12 +291,12 @@ function Home () {
               <div className='fund-list__field'>申購日期: {f.date ? `${f.date}` : '-'}</div>
               <div className='fund-list__field'>投資金額: {f.amount ? `$${formatCurrency(f.amount)}` : '-'}</div>
               <div className='fund-list__field'>申購淨值: ${formatCurrency(f.price)}</div>
-              <div className='fund-list__field'>參考淨值: ${formatCurrency(f.currentPrice)}</div>
+              <div className='fund-list__field'>參考淨值: {f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</div>
               <div className='fund-list__field'>投資損益: {f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</div>
               <div className='fund-list__field'>累計配息: {f.interest ? `$${formatCurrency(f.interest)}` : '-'}</div>
 
               <div className='fund-list__field'>
-                報酬率: <span className={'fund-list__rate ' + (f.returnRate >= 0 ? 'up-color' : 'down-color')}>{f.returnRate}%</span>
+                報酬率: <span className={f.returnRate !== '' ? ('fund-list__rate ' + (f.returnRate >= 0 ? 'up-color' : 'down-color')) : ''}>{f.returnRate ? `${f.returnRate}%` : '-'}</span>
               </div>
 
               <div className='fund-list__field'>
@@ -336,9 +345,9 @@ function Home () {
                   <td style={{ textAlign: 'center' }}>{f.date || '-'}</td>
                   <td>{f.amount ? `$${formatCurrency(f.amount)}` : '-'}</td>
                   <td>${formatCurrency(f.price)}</td>
-                  <td>${formatCurrency(f.currentPrice)}</td>
+                  <td>{f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</td>
                   <td>{f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</td>
-                  <td className={f.returnRate >= 0 ? 'up-color' : 'down-color'}>{f.returnRate}%</td>
+                  <td className={f.returnRate !== '' ? (f.returnRate >= 0 ? 'up-color' : 'down-color') : ''}>{f.returnRate ? `${f.returnRate}%` : '-'}</td>
                   <td>{f.interest ? `$${formatCurrency(f.interest)}` : '-'}</td>
                   <td className={f.returnRateWithInterest !== '' ? (f.returnRateWithInterest >= 0 ? 'up-color' : 'down-color') : ''}>{f.returnRateWithInterest ? `${f.returnRateWithInterest}%` : '-'}</td>
 
