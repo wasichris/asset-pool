@@ -26,9 +26,13 @@ const getReturnRateWithInterestPercentage = ({ price, currentPrice, amount, inte
 }
 
 const formatCurrency = (num) => {
-  const parts = num.toString().split('.')
-  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-  return parts.join('.')
+  if (num) {
+    const parts = num.toString().split('.')
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    return parts.join('.')
+  }
+
+  return ''
 }
 
 function Home () {
