@@ -149,7 +149,7 @@ function Home () {
     const fundname = fundOptions.find(f => f.id === fundid).name.trim()
     const fundtype = fundOptions.find(f => f.id === fundid).type.trim()
     const newFunds = [...myFunds]
-    newFunds.push({ key: fundid + '-' + (new Date()).getTime(), id: fundid, name: fundname, price, type: fundtype, date, amount })
+    newFunds.push({ key: fundid + '-' + (new Date()).getTime(), id: fundid, name: fundname, price, type: fundtype, date: moment(date).format('YYYY-MM-DD'), amount })
     setMyFunds(newFunds)
     saveMyFunds(user.uid, newFunds)
     closeAddFundModal()
