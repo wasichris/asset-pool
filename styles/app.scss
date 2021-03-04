@@ -7,8 +7,6 @@ body {
   padding: 0;
   margin: 0;
   font-family: "Arial", "微軟正黑體", sans-serif;
-  // font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
-  //   Helvetica Neue, sans-serif;
 }
 
 body {
@@ -171,22 +169,22 @@ body {
   }
 }
 
-.ant-card.login-card {
+.login-card {
   width: 100%;
   max-width: 400px;
   // background-color:#009FCC;
 
-  .login-form-button {
+  &__button {
     width: 100%;
   }
 
-  .site-form-item-icon {
+  &__icon {
     color: rgba(0, 0, 0, 0.25);
     margin-right: 5px;
   }
 }
 
-.ant-card.register-card {
+.register-card {
   width: 100%;
   max-width: 500px;
 }

@@ -126,7 +126,7 @@ export default function Login (props) {
                 filterOption={(inputValue, option) =>
                   option.value.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1}
               >
-                <Input prefix={<MailOutlined className='site-form-item-icon' />} placeholder='E-mail' size='large' />
+                <Input prefix={<MailOutlined className='login-card__icon' />} placeholder='E-mail' size='large' />
               </AutoComplete>
             </Form.Item>
 
@@ -135,7 +135,7 @@ export default function Login (props) {
               rules={[{ required: true, message: '請輸入密碼' }]}
             >
               <Input
-                prefix={<LockOutlined className='site-form-item-icon' />}
+                prefix={<LockOutlined className='login-card__icon' />}
                 type='password'
                 placeholder='Password'
                 size='large'
@@ -148,7 +148,7 @@ export default function Login (props) {
             </Form.Item>
 
             <Form.Item>
-              <Button type='primary' htmlType='submit' className='login-form-button'>
+              <Button type='primary' htmlType='submit' className='login-card__button'>
                 登入
               </Button>
               <Link href='/register'>
