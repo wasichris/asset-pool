@@ -300,8 +300,8 @@ function Home () {
       {user && user.emailVerified === false &&
         <Result
           status='403'
-          subTitle='用戶郵件尚未完成驗證，請重新發送驗證信。'
-          extra={<Button onClick={sendVerifyMail} type='primary'>發送驗證信</Button>}
+          subTitle='用戶郵件尚未完成驗證'
+          extra={<Button onClick={sendVerifyMail} type='primary'>重新發送驗證信</Button>}
         />}
 
       {/* 已通過郵件驗證 */}
