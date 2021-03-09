@@ -58,9 +58,18 @@ export default function Register (props) {
           email,
           nickname
         }).then(() => {
-          // 儲存成功後顯示訊息
-          message.info('註冊用戶成功，請登入系統。')
-          router.push('/login')
+          // 儲存成功後，發送驗證信
+          const user = firebase.auth().currentUser
+          user
+            .sendEmailVerification()
+            .then(function () {
+              // 驗證信發送完成
+              message.info('驗證信已發送至您的信箱，請點選信件內連結來進行驗證。')
+              router.push('/login')
+            }).catch(error => {
+              // 驗證信發送失敗
+              message.error('驗證信發送失敗: ' + error.message)
+            })
         })
       }).catch(error => {
         // 註冊失敗時顯示錯誤訊息

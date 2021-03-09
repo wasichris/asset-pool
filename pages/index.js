@@ -2,7 +2,7 @@ import Head from 'next/head'
 import { useEffect, useState } from 'react'
 import Layout from '../components/Layout'
 import axios from 'axios'
-import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography, DatePicker } from 'antd'
+import { Modal, Button, Input, Form, InputNumber, message, Select, Space, List, Typography, DatePicker, Result } from 'antd'
 import firebase from 'firebase/app'
 import { DeleteTwoTone, EditTwoTone } from '@ant-design/icons'
 import { useRouter } from 'next/router'
@@ -73,7 +73,7 @@ function Home () {
     const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         setIsLogin(true)
-        setUser({ uid: user.uid, email: user.email })
+        setUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified })
       } else {
         router.push('/login')
       }
@@ -273,6 +273,20 @@ function Home () {
     return ''
   }
 
+  const sendVerifyMail = () => {
+    // 發送驗證信
+    const user = firebase.auth().currentUser
+    user.sendEmailVerification()
+      .then(function () {
+        // 驗證信發送完成
+        message.info('驗證信已發送至您的信箱，請點選信件內連結來進行驗證。')
+        router.push('/login')
+      }).catch(error => {
+        // 驗證信發送失敗
+        message.error('驗證信發送失敗: ' + error.message)
+      })
+  }
+
   return (
     <Layout user={user} isHide={isLogin === false}>
 
@@ -282,113 +296,127 @@ function Home () {
 
       <h1>基金損益表</h1>
 
-      <div>
+      {/* 尚未通過郵件驗證 */}
+      {user && user.emailVerified === false &&
+        <Result
+          status='403'
+          subTitle='用戶郵件尚未完成驗證，請重新發送驗證信。'
+          extra={<Button onClick={sendVerifyMail} type='primary'>發送驗證信</Button>}
+        />}
 
-        {/* 功能鍵區塊 */}
-        <Space>
-          <Button type='button' onClick={exportMyFunds}>匯出</Button>
-          <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
-          <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
-        </Space>
-      </div>
+      {/* 已通過郵件驗證 */}
+      {user && user.emailVerified === true &&
+        <>
 
-      <br />
+          <div>
 
-      {/* 基金清單 - mobile */}
+            {/* 功能鍵區塊 */}
+            <Space>
+              <Button type='button' onClick={exportMyFunds}>匯出</Button>
+              <Button type='button' onClick={() => setIsShowImportFundModal(true)}>匯入</Button>
+              <Button type='button' onClick={() => setIsShowAddFundModal(true)}>新增我的基金</Button>
+            </Space>
+          </div>
 
-      <List
-        className='fund-list'
-        bordered
-        loading={isLoading}
-        dataSource={fundDetails}
-        renderItem={f => (
-          <List.Item>
+          <br />
 
-            <div className='fund-list__item'>
-              <Typography.Title level={5}>{f.name}</Typography.Title>
-              <div className='fund-list__field'>申購日期: {f.date ? `${f.date}` : '-'}</div>
-              <div className='fund-list__field'>投資金額: {f.amount ? `$${formatCurrency(f.amount)}` : '-'}</div>
-              <div className='fund-list__field'>申購淨值: ${formatCurrency(f.price)}</div>
-              <div className='fund-list__field'>參考淨值: {f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</div>
-              <div className='fund-list__field'>投資損益: {f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</div>
-              <div className='fund-list__field'>累計配息: {f.interest ? `$${formatCurrency(f.interest)}` : '-'}</div>
+          {/* 基金清單 - mobile */}
 
-              <div className='fund-list__field'>
-                報酬率: <span className={rateClass('fund-list__rate', f.returnRate)}>{f.returnRate !== '' ? `${f.returnRate}%` : '-'}</span>
-              </div>
+          <List
+            className='fund-list'
+            bordered
+            loading={isLoading}
+            dataSource={fundDetails}
+            renderItem={f => (
+              <List.Item>
 
-              <div className='fund-list__field'>
-                含息報酬率: <span className={rateClass('fund-list__rate', f.returnRateWithInterest)}>{f.returnRateWithInterest !== '' ? `${f.returnRateWithInterest}%` : '-'}</span>
-              </div>
+                <div className='fund-list__item'>
+                  <Typography.Title level={5}>{f.name}</Typography.Title>
+                  <div className='fund-list__field'>申購日期: {f.date ? `${f.date}` : '-'}</div>
+                  <div className='fund-list__field'>投資金額: {f.amount ? `$${formatCurrency(f.amount)}` : '-'}</div>
+                  <div className='fund-list__field'>申購淨值: ${formatCurrency(f.price)}</div>
+                  <div className='fund-list__field'>參考淨值: {f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</div>
+                  <div className='fund-list__field'>投資損益: {f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</div>
+                  <div className='fund-list__field'>累計配息: {f.interest ? `$${formatCurrency(f.interest)}` : '-'}</div>
 
-              <div className='fund-list__field'>參考日: {f.currentPriceRefDate}</div>
+                  <div className='fund-list__field'>
+                    報酬率: <span className={rateClass('fund-list__rate', f.returnRate)}>{f.returnRate !== '' ? `${f.returnRate}%` : '-'}</span>
+                  </div>
 
-              <div className='fund-list__action'>
-                <Button type='link' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
-                <Button type='link' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
-              </div>
+                  <div className='fund-list__field'>
+                    含息報酬率: <span className={rateClass('fund-list__rate', f.returnRateWithInterest)}>{f.returnRateWithInterest !== '' ? `${f.returnRateWithInterest}%` : '-'}</span>
+                  </div>
 
-            </div>
+                  <div className='fund-list__field'>參考日: {f.currentPriceRefDate}</div>
 
-          </List.Item>
-        )}
-      />
+                  <div className='fund-list__action'>
+                    <Button type='link' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
+                    <Button type='link' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
+                  </div>
 
-      {/* 基金清單 - pc */}
-      <div>
+                </div>
 
-        <table className='fund-table'>
-
-          <thead>
-            <tr>
-              <th style={{ width: '30%' }}>基金名稱</th>
-              <th>申購<br />日期</th>
-              <th>投資<br />金額</th>
-              <th>申購<br />淨值</th>
-              <th>參考<br />淨值</th>
-              <th>投資<br />損益</th>
-              <th>報酬率</th>
-              <th>累計<br />配息</th>
-              <th>含息<br />報酬率</th>
-              <th />
-            </tr>
-          </thead>
-
-          <tbody>
-
-            {!isLoading && fundDetails && fundDetails.map(f => {
-              return (
-                <tr key={f.key}>
-                  <td style={{ textAlign: 'left' }}>{f.name}</td>
-                  <td style={{ textAlign: 'center' }}>{f.date || '-'}</td>
-                  <td>{f.amount ? `$${formatCurrency(f.amount)}` : '-'}</td>
-                  <td>${formatCurrency(f.price)}</td>
-                  <td>{f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</td>
-                  <td>{f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</td>
-                  <td className={rateClass('', f.returnRate)}>{f.returnRate !== '' ? `${f.returnRate}%` : '-'}</td>
-                  <td>{f.interest ? `$${formatCurrency(f.interest)}` : '-'}</td>
-                  <td className={rateClass('', f.returnRateWithInterest)}>{f.returnRateWithInterest !== '' ? `${f.returnRateWithInterest}%` : '-'}</td>
-
-                  <td style={{ textAlign: 'center' }}>
-                    <Space>
-                      <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
-                      <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
-                    </Space>
-                  </td>
-                </tr>
-              )
-            })}
-
-            {isLoading && (
-              <tr>
-                <td colSpan='10' style={{ textAlign: 'left' }}> 資料讀取中... </td>
-              </tr>
+              </List.Item>
             )}
+          />
 
-          </tbody>
-        </table>
+          {/* 基金清單 - pc */}
+          <div>
 
-      </div>
+            <table className='fund-table'>
+
+              <thead>
+                <tr>
+                  <th style={{ width: '30%' }}>基金名稱</th>
+                  <th>申購<br />日期</th>
+                  <th>投資<br />金額</th>
+                  <th>申購<br />淨值</th>
+                  <th>參考<br />淨值</th>
+                  <th>投資<br />損益</th>
+                  <th>報酬率</th>
+                  <th>累計<br />配息</th>
+                  <th>含息<br />報酬率</th>
+                  <th />
+                </tr>
+              </thead>
+
+              <tbody>
+
+                {!isLoading && fundDetails && fundDetails.map(f => {
+                  return (
+                    <tr key={f.key}>
+                      <td style={{ textAlign: 'left' }}>{f.name}</td>
+                      <td style={{ textAlign: 'center' }}>{f.date || '-'}</td>
+                      <td>{f.amount ? `$${formatCurrency(f.amount)}` : '-'}</td>
+                      <td>${formatCurrency(f.price)}</td>
+                      <td>{f.currentPrice ? `$${formatCurrency(f.currentPrice)}` : '-'}</td>
+                      <td>{f.returnAmount ? `$${formatCurrency(f.returnAmount)}` : '-'}</td>
+                      <td className={rateClass('', f.returnRate)}>{f.returnRate !== '' ? `${f.returnRate}%` : '-'}</td>
+                      <td>{f.interest ? `$${formatCurrency(f.interest)}` : '-'}</td>
+                      <td className={rateClass('', f.returnRateWithInterest)}>{f.returnRateWithInterest !== '' ? `${f.returnRateWithInterest}%` : '-'}</td>
+
+                      <td style={{ textAlign: 'center' }}>
+                        <Space>
+                          <Button type='button' onClick={() => removeFund(f.key)} icon={<DeleteTwoTone />} />
+                          <Button type='button' onClick={() => showUpdateFundModal(f.key)} icon={<EditTwoTone />} />
+                        </Space>
+                      </td>
+                    </tr>
+                  )
+                })}
+
+                {isLoading && (
+                  <tr>
+                    <td colSpan='10' style={{ textAlign: 'left' }}> 資料讀取中... </td>
+                  </tr>
+                )}
+
+              </tbody>
+            </table>
+
+          </div>
+
+        </>}
 
       {/* 新增基金 */}
 
