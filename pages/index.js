@@ -23,6 +23,16 @@ const getReturnRatePercentage = ({ price, currentPrice }) => {
   return ''
 }
 
+const getReturnAmount = ({ price, currentPrice, amount }) => {
+  if (price && currentPrice && amount) {
+    const returnRate = (currentPrice - price) / price
+    const returnAmount = amount * returnRate
+    return round(returnAmount)
+  }
+
+  return ''
+}
+
 const getReturnRateWithInterestPercentage = ({ price, currentPrice, amount, interest }) => {
   if (price && currentPrice && amount && interest) {
     const returnRate = (currentPrice - price) / price
@@ -108,17 +118,17 @@ function Home () {
               const currentPrice = data.price
               const currentPriceRefDate = data.refdate
               newFundDetails.push({
-                key: key,
-                id: id,
-                name: name,
-                date: date,
-                amount: amount,
-                price: price,
-                currentPrice: currentPrice,
-                currentPriceRefDate: currentPriceRefDate,
+                key,
+                id,
+                name,
+                date,
+                amount,
+                price,
+                currentPrice,
+                currentPriceRefDate,
                 returnRate: getReturnRatePercentage({ price, currentPrice }),
-                returnAmount: (amount && currentPrice) ? round(amount * ((currentPrice - price) / price)) : '',
-                interest: interest,
+                returnAmount: getReturnAmount({ price, currentPrice, amount }),
+                interest,
                 returnRateWithInterest: getReturnRateWithInterestPercentage({ price, currentPrice, amount, interest })
               })
             }

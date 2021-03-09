@@ -7,7 +7,7 @@ export default async (req, res) => {
   // req data
   const { query: { name } } = req
 
-  // get html
+  // get data
   const url = 'https://www.moneydj.com/funddj/djjson/YFundSearchJSON.djjson?q=' + encodeURIComponent(name)
   const { data } = await axios.get(url, {
     responseType: 'arraybuffer',
@@ -19,8 +19,8 @@ export default async (req, res) => {
 
   // data = 'TLZF7|安聯主題趨勢基金-AT累積類股(美元)|2,TLZH8|安聯主題趨勢基金-BT累積類股(美元)|2,TLZF8|安聯主題趨勢基金-IT累積類股(美元)|2,'
 
+  // parser
   let fundData = []
-
   if (data && data.length > 1) {
     const funds = data.split(',')
     fundData = funds.map(f => {
