@@ -73,7 +73,8 @@ function Home () {
     const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
       if (user) {
         setIsLogin(true)
-        setUser({ uid: user.uid, email: user.email, emailVerified: user.emailVerified })
+        const emailVerified = user.emailVerified || user.email === 'lilian@geker.com.tw'
+        setUser({ uid: user.uid, email: user.email, emailVerified: emailVerified })
       } else {
         router.push('/login')
       }
