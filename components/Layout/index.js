@@ -52,7 +52,7 @@ export default function Layout ({ children, user, noBg, isHide }) {
               </div>
 
               <div className='header__username'>
-                {user.email}
+                Hi~ {user.nickname}
               </div>
 
             </div>}

@@ -70,11 +70,17 @@ function Home () {
   const router = useRouter()
 
   useEffect(() => {
-    const unsubscribe = firebase.auth().onAuthStateChanged(function (user) {
+    const unsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
       if (user) {
         setIsLogin(true)
+
+        // get nickname from db
+        const snapshot = await firebase.database().ref(`users/${user.uid}/`).once('value')
+        const nickname = snapshot.val().nickname
+
+        // store user info in state
         const emailVerified = user.emailVerified || user.email === 'lilian@geker.com.tw'
-        setUser({ uid: user.uid, email: user.email, emailVerified: emailVerified })
+        setUser({ uid: user.uid, email: user.email, emailVerified: emailVerified, nickname: nickname })
       } else {
         router.push('/login')
       }
@@ -189,7 +195,7 @@ function Home () {
   const showUpdateFundModal = (key) => {
     const targetFund = myFunds.find(f => f.key === key)
     setTargetUpdateFund(targetFund)
-    form.setFieldsValue({ ...targetFund, date: moment(targetFund.date) })
+    form.setFieldsValue({ ...targetFund, date: moment(targetFund.date), interest: targetFund.interest || 0 })
     setIsShowUpdateFundModal(true)
   }
 
@@ -429,7 +435,7 @@ function Home () {
       >
         <Form
           name='basic'
-          initialValues={{}}
+          initialValues={{ date: moment(new Date()), amount: 0, price: 0 }}
           onFinish={addFund}
         >
 
@@ -473,7 +479,18 @@ function Home () {
           <Form.Item
             label='申購淨值'
             name='price'
-            rules={[{ required: true, message: '請輸入申購淨值' }]}
+            rules={[
+              { required: true, message: '請輸入申購淨值' },
+              () => ({
+                validator (_, value) {
+                  if (value > 0) {
+                    return Promise.resolve()
+                  }
+                  // eslint-disable-next-line prefer-promise-reject-errors
+                  return Promise.reject('申購淨值需大於0')
+                }
+              })
+            ]}
           >
             <InputNumber />
           </Form.Item>
@@ -559,7 +576,17 @@ function Home () {
           <Form.Item
             label='申購淨值'
             name='price'
-            rules={[{ required: true, message: '請輸入申購淨值' }]}
+            rules={[
+              { required: true, message: '請輸入申購淨值' },
+              () => ({
+                validator (_, value) {
+                  if (value > 0) {
+                    return Promise.resolve()
+                  }
+                  // eslint-disable-next-line prefer-promise-reject-errors
+                  return Promise.reject('申購淨值需大於0')
+                }
+              })]}
           >
             <InputNumber />
           </Form.Item>
