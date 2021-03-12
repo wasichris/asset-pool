@@ -2,7 +2,7 @@
 @import "variables"; // 變數
 @import "mixins"; // 方法
 
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Indie+Flower&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Dancing+Script&display=swap');
 
 html,
 body {
@@ -82,8 +82,8 @@ body {
     float: right;
     line-height: $header-height;
     margin: 0 10px;
-    font-size: 19px;
-    font-family: 'Indie Flower', cursive;
+    font-size: 20px;
+    font-family: 'Dancing Script', cursive;
   }
 
   &__logout {
